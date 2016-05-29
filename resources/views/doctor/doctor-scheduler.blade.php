@@ -66,132 +66,16 @@
 													@if($d_t)
 														<tr>
 															<td>{{ $d_t->day }}</td>
-															<td> <p>{{ $d_t->start_interval }} - {{ $d_t->end_interval }}<a class="close"
-																href="{{ action('CalendarController@sche_del', [$d_t->date, $d_t->schedule_date, $d_t->username]) }}">X</a>
-																</p><br><div class="addbtn_cont">
-																	<a href="#" id="{{ $d_t->id }}" class="addbtn">+ Modify</a>
-																	{!!Form::open(['url'=>'/set-timing'])!!}
-																	<div id="{{ $d_t->id }}click" class="add_form_container">
-																		<div class="arrow"></div>
-																		<div class="add_form">
-																			<div class="form-cont">
-																				<input type="hidden" name="username" value="{{ $user->username }}">
-																				<input type="hidden" name="day" value="{{ $name_o_day }}">
-																				<input type="hidden" name="date" value="{{ $date_human }}">
-																				<label>From</label>
-																				<select name="starting_interval">
-																					<option value="">Hour</option>
-
-																					@foreach($hours as $hour)
-																						<option value="{{ $hour }}">{{ $hour }}</option>
-																					@endforeach
-
-																				</select>
-
-																				<select name="starting_min">
-																					<option value="00">00</option>
-																					<option value="30">30</option>
-																				</select>
-
-																				<label>For</label>
-																				<select name="duration">
-																					<option value="">Duration</option>
-																					<option value="30">30 minutes</option>
-																					<option value="60">1 hour</option>
-																					<option value="90">1 hour 30 minutes</option>
-																					<option value="120">2 hours</option>
-																				</select>
-																				<br>
-																				<label>Interval</label>
-																				<select name="interval">
-																					<option value="">Interval</option>
-																					<option value="15">15 mins</option>
-																					<option value="30">30 mins</option>
-																				</select>
-																				<label>Reason</label>
-																				<select name="reason">
-																					<option value="">Reason</option>
-																					<option value="appointments">Appointment</option>
-																					<option value="others">Other</option>
-																				</select>
-
-
-																				<div class="clearfix"></div>
-
-
-
-																			</div>
-
-																			<div class="ft">
-																				<div class="row">
-																					<div class="col-xs-8 col-sm-8 col-md-8">
-																						<input type="radio" name="type" value="monthly"> This month</input>
-																						<input type="radio" name="type" value="yearly"> This year</input>
-																						<br>
-
-
-																					</div>
-																					<div class="col-xs-4 col-sm-4 col-md-4">
-																						<input type="submit" value="Add"/>
-																					</div>
-																				</div>
-																			</div>
-																		</div>
-																	</div>
-																	</div>
-																{!!Form::close()!!}
+															<td> <p>{{ $d_t->start_interval }} - {{ $d_t->end_interval }}</p><p><a class="close"
+																href="{{ action('CalendarController@sche_del', [$d_t->date, $d_t->schedule_date, $d_t->username]) }}">Remove for today</a>
+                                                                    <a class="close"
+                                                                       href="{{ action('CalendarController@sche_del_plan', [$d_t->date, $d_t->schedule_date, $d_t->username]) }}">Remove total plan</a>
+																</p><br>
 															</td>
 														</tr>
 														<br>
 														<div class="clearfix"></div>
-														<script type="text/javascript">
-															$('#{{ $d_t->id }}').click(function() {
-																if ($(this).hasClass("current")) {
-																	$(this).removeClass("current");
-																}
-																else {$(this).addClass("current");}
 
-																$('#{{ $d_t->id }}click').slideToggle(500);
-															});
-														</script>
-														<script type="text/javascript">
-															$('#time-auto')
-																	.textext({
-																		plugins : 'autocomplete filter',
-																		useSuggestionsToFilter : true
-																	})
-																	.bind('getSuggestions', function(e, data)
-																	{
-																		var list = [
-																					'Basic',
-																					'Closure',
-																					'Cobol',
-																					'Delphi',
-																					'Erlang',
-																					'Fortran',
-																					'Go',
-																					'Groovy',
-																					'Haskel',
-																					'Java',
-																					'JavaScript',
-																					'OCAML',
-																					'PHP',
-																					'Perl',
-																					'Python',
-																					'Ruby',
-																					'Scala'
-																				],
-																				textext = $(e.target).textext()[0],
-																				query = (data ? data.query : '') || ''
-																				;
-
-																		$(this).trigger(
-																				'setSuggestions',
-																				{ result : textext.itemManager().filter(list, query) }
-																		);
-																	})
-															;
-														</script>
 
 													@endif
 												@endforeach

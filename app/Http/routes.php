@@ -126,5 +126,6 @@ Route::group(['middleware' => ['web','auth','revalidate']], function () {
 	Route::post('/cover-photo', 'TestController@cover');
 	Route::post('/admin-profile-edit', 'EntityController@en_make_profile');
 	Route::get('/delete/{date}/{created_date}/{username}', 'CalendarController@sche_del');
+    Route::get('/delete-plan/{date}/{created_date}/{username}', 'CalendarController@sche_del_plan');
 });
 

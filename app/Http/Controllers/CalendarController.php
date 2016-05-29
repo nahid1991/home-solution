@@ -372,4 +372,8 @@ class CalendarController extends Controller
             ->delete();
         return Redirect::back();
     }
+
+    public function sche_del_plan($date, $index, $username){
+        echo($date.' '.$index.' '.$username);
+    }
 }
