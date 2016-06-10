@@ -17,6 +17,10 @@
 										<a href="{{ url('/entity-appointments') }}">Appointment</a></li><li>
 										<a href="{{ url('/entity-profile') }}">Profile</a></li><li>
 										<a href="{{ url('/entity-profile-edit') }}">Edit Profile</a></li><li>
+										<a href="{{ url('/calendar/'.$doc_info->username.'/'.$month.'/'.$year) }}">Dr. {{ $doc_info->name }}'s
+											<span style="color: firebrick">Schedule</span> Calendar</a></li><li>
+										<a href="{{ url('/today/'.$doc_info->username) }}">Dr. {{ $doc_info->name }}'s
+											<span style="color: firebrick">Today's</span> appointments</a></li><li>
 										<a href="{{ url('/entity-account-settings') }}">Account Settings</a></li><li>
 										<a href="{{ url('/auth/logout') }}">Logout</a></li></ul>
 							</div>
@@ -29,18 +33,31 @@
 										<div class="edpof-left">
 											<div class="doctorsignup-holder edit-holder epof-editholder">
 												<h1>{{ $user->name }}</h1>
-												
+
 												<label for="">Select Doctor</label>
-												 {!!Form::open(['url'=>'/find-doc/', 'id'=>'contact-form'])!!}
-												 <select name="doctor_user">
+												{!!Form::open(['url'=>'/find-doc', 'id'=>'contact-form'])!!}
+												 <select name="doctor_user" onchange="change()">
 												 	<option value="">Select</option>
 												 @foreach($listed_doc_pat as $ldp)
-													<option value="{{ $ldp->doctor_user }}">{{ $ldp->doctor_name }}</option>
-												 @endforeach											
+													<option id="{{ $ldp->doctor_user }}" value="{{ $ldp->doctor_user }}">{{ $ldp->doctor_name }}</option>
+
+
+												 @endforeach
 												</select>
-													{!!Form::submit('Go')!!}
-													<!-- <a href="doctor-admin-appointments-day-view.php">LOGIN</a> -->
 												{!!Form::close()!!}
+												<script type = "text/javascript">
+
+													$('select').change(function () {
+														var link = $("select option:selected").val();
+														console.log(link);
+														$('form').submit();
+													});
+
+												</script>
+
+
+													<!-- <a href="doctor-admin-appointments-day-view.php">LOGIN</a> -->
+
 												
 											</div>
 
@@ -83,9 +100,9 @@
 									</div>
 									<div class="col-xs-12 col-sm-6 col-md-6">
 										<ul class="view-type-link">
-											<li><a class="current" href="{{ url('/doctor/{$username}') }}" rel="tooltip" title="Day View"><img src="/images/day-view.png" alt=""><span></span></a></li><li>
+											{{--<li><a class="current" href="{{ url('/doctor/{$username}') }}" rel="tooltip" title="Day View"><img src="/images/day-view.png" alt=""><span></span></a></li><li>--}}
 												<!-- <a href="entity-admin-appointments-week-view.php" rel="tooltip" title="Week View"><img src="/images/week-view.png" alt=""><span></span></a></li><li> -->
-												<a href="{{ action('EntityController@calendar', [$doc_info->username]) }}" rel="tooltip" title="Month View"><img src="/images/month-view.png" alt=""><span></span></a></li>
+{{--												<a href="{{ action('EntityController@calendar', [$doc_info->username]) }}" rel="tooltip" title="Month View"><img src="/images/month-view.png" alt=""><span></span></a></li>--}}
 										</ul>
 									</div>
 								</div>								
@@ -96,10 +113,10 @@
 							
 
 							<div class="row">
-								<div class="col-xs-12 col-sm-6 col-md-6">
+								<div class="col-xs-12 col-sm-12 col-md-12">
 									<div class="pof-content">
 										<div class="pof-header3">
-											<div class="title">Today's Appointment</div>
+											<div class="title">Appointment requests</div>
 										</div>
 										<div class="pof-desc">
 											<ul class="appoin-list">
@@ -113,7 +130,7 @@
 													</div><div class="s-right">
 														<div class="time">{{ $p_l->appointed_at }}</div>
 														<ul class="action">
-															<li><a href="{{  action('EntityController@approve', [$doc_info->username, $p_l->patient_name, $p_l->appointment_time])  }}" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
+															<li><a href="{{  action('EntityController@approve', [$doc_info->username, $p_l->patient_name, $p_l->appointment_time, $p_l->sl_no])  }}" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
 															<!-- <li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left current"></i></a></li> -->
 															<li><a href="{{  action('EntityController@cancel', [$doc_info->username, $p_l->patient_name])  }}" rel="tooltip" title="Cancel"><i class="icon icon-times"></i></a></li>
 														</ul>
@@ -121,103 +138,13 @@
 												</li>
 												@endif
 												@endforeach
-												
-												<!-- <li>
-													<div class="s-left">
-														<h2>Bismith Jonh</h2>
-														<p>Diabetic Issues</p>
-													</div><div class="s-right">
-														<div class="time">10:30 AM - 11:00 AM</div>
-														<ul class="action">
-															<li><a href="#" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left current"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Cancel"><i class="icon icon-times"></i></a></li>
-														</ul>
-													</div>
-												</li><li>
-													<div class="s-left">
-														<h2>Bismith Jonh</h2>
-														<p>Diabetic Issues</p>
-													</div><div class="s-right">
-														<div class="time">11:00 AM  - 12:00 PM</div>
-														<ul class="action">
-															<li><a href="#" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Cancel"><i class="icon icon-times current"></i></a></li>
-														</ul>
-													</div>
-												</li><li class="current">
-													<div class="s-left">
-														<h2>Mic A Ting</h2>
-														<p>Diabetic Issues</p>
-													</div><div class="s-right">
-														<div class="time">12 PM  - 12:30 PM</div>
-														<ul class="action">
-															<li><a href="#" rel="tooltip" title="Check In"><i class="icon icon-arrow-right current"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Cancel"><i class="icon icon-times"></i></a></li>
-														</ul>
-													</div>
-												</li><li>
-													<div class="s-left">
-														<h2>Bismith Jonh</h2>
-														<p>Diabetic Issues</p>
-													</div><div class="s-right">
-														<div class="time">2:00 PM  - 2:30 PM</div>
-														<ul class="action">
-															<li><a href="#" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Cancel"><i class="icon icon-times"></i></a></li>
-														</ul>
-													</div>
-												</li><li>
-													<div class="s-left">
-														<h2>Bismith Jonh</h2>
-														<p>Diabetic Issues</p>
-													</div><div class="s-right">
-														<div class="time">2:30 PM  - 3:30 PM</div>
-														<ul class="action">
-															<li><a href="#" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Cancel"><i class="icon icon-times"></i></a></li>
-														</ul>
-													</div>
-												</li><li>
-													<div class="s-left">
-														<h2>Bismith Jonh</h2>
-														<p>Diabetic Issues</p>
-													</div><div class="s-right">
-														<div class="time">3:30 PM - 4:00 PM</div>
-														<ul class="action">
-															<li><a href="#" rel="tooltip" title="Check In"><i class="icon icon-arrow-right"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Check Out"><i class="icon icon-arrow-left"></i></a></li>
-															<li><a href="#" rel="tooltip" title="Cancel"><i class="icon icon-times"></i></a></li>
-														</ul>
-													</div>
-												</li> -->
+
 											</ul>
 										</div><!-- End .pof-desc -->
 									</div><!-- End .pof-content -->
 								</div>
 
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="patient-details">
-										<div class="single-pof-pic">
-											<img src="/images/patient-pof-pic.jpg" alt=""/>
-										</div>
-										<div class="single-pof-dsc">
-											<h2>Mic A Ting</h2>
-											<h3>Blood Pressure Issues</h3>
-											<p>
-												DOB: 12 -  25 - 1945
-												<br>
-												Age: 68 Years
-												<br>
-												Tel.: 2514- 2541-2516
-											</p>											
-										</div>
-									</div>
-								</div>
+
 							</div>
 
 							</div><!-- End .pof-content -->
@@ -226,5 +153,6 @@
 				</div><!-- End .conteiner -->
 				
 			</div><!-- End full-body-conteiner -->
+
 			
 @stop

@@ -107,45 +107,70 @@ class DoctorController extends Controller
     public function prescribe(Request $request){
         $user = \Auth::user();
         // echo($request->input('appoint'));
+        $p_holder = $request->input('prescription');
+        $c_holder = $request->input('comment');
 
 
-        DB::table('visit_record')
-            ->insert([
-                'd_username' => $user->username,
-                'p_username' => $request->input('p_user'),
-                'patient_name' => $request->input('p_name'),
-                'issue' => $request->input('issue'),
-                'comments' => $request->input('comment'),
-                'prescription' => $request->input('prescription'),
-                'visit_time' => $request->input('p_appoint')
-            ]);
-       
-        $temp = DB::table('appointment_user')
-            ->where('patient_user', '=', $request->input('p_user'))
-            ->where('doctor_user', '=', $request->input('d_user'))
-            ->where('approved', '=', '1')
-            ->where('appointment_time', '=', $request->input('appoint'))
-            ->get();
+        if(strlen($p_holder)>=10 || strlen($c_holder)>=10){
+            if(strlen($p_holder)>=10 && strlen($c_holder)>=10){
+                DB::table('visit_record')
+                    ->insert([
+                        'd_username' => $user->username,
+                        'p_username' => $request->input('p_user'),
+                        'patient_name' => $request->input('p_name'),
+                        'issue' => $request->input('issue'),
+                        'comments' => $c_holder,
+                        'hidden_comment' => substr($c_holder, 0, 8),
+                        'prescription' => $p_holder,
+                        'hidden_prescription' => substr($p_holder, 0, 8),
+                        'visit_time' => $request->input('p_appoint')
+                    ]);
+            }
+
+            if(strlen($p_holder)>=10 && strlen($c_holder)<10){
+                DB::table('visit_record')
+                    ->insert([
+                        'd_username' => $user->username,
+                        'p_username' => $request->input('p_user'),
+                        'patient_name' => $request->input('p_name'),
+                        'issue' => $request->input('issue'),
+                        'comments' => $c_holder,
+                        'prescription' => $p_holder,
+                        'hidden_prescription' => substr($p_holder, 0, 8),
+                        'visit_time' => $request->input('p_appoint')
+                    ]);
+            }
+            if(strlen($p_holder)<10 && strlen($c_holder)>=10){
+                DB::table('visit_record')
+                    ->insert([
+                        'd_username' => $user->username,
+                        'p_username' => $request->input('p_user'),
+                        'patient_name' => $request->input('p_name'),
+                        'issue' => $request->input('issue'),
+                        'comments' => $c_holder,
+                        'hidden_comment' => substr($c_holder, 0, 8),
+                        'prescription' => $p_holder,
+                        'visit_time' => $request->input('p_appoint')
+                    ]);
+            }
+        }
+
+        else{
+            DB::table('visit_record')
+                ->insert([
+                    'd_username' => $user->username,
+                    'p_username' => $request->input('p_user'),
+                    'patient_name' => $request->input('p_name'),
+                    'issue' => $request->input('issue'),
+                    'comments' => $request->input('comment'),
+                    'prescription' => $request->input('prescription'),
+                    'visit_time' => $request->input('p_appoint')
+                ]);
+        }
 
         
 
-       // foreach($temp as $tmp){
-       //      DB::table('appointment_user')
-       //          ->insert([
-       //              'doctor_user' => $tmp->doctor_user,
-       //              'patient_user' => $tmp->patient_user,
-       //              'patient_name' => $tmp->patient_name,
-       //              'issues' => $request->input('issue'),
-       //              'admin_user' => $tmp->admin_user,
-       //              'name' => $tmp->name,
-       //              'approved' => '2',
-       //              'email' => $tmp->email,
-       //              'phone_number' => $tmp->phone_number,
-       //              'appointed_at' => $tmp->appointed_at,
-       //              'patient_name' => $tmp->patient_name,
-       //              'appointment_time' => $tmp->appointment_time,
-       //      ]);
-       // }
+
 
         DB::table('appointment_user')
             ->where('patient_user', '=', $request->input('p_user'))
@@ -158,13 +183,241 @@ class DoctorController extends Controller
     }
 
 
-    public function patient_profile($username){
+//    public function patient_profile($username, $name){
+//        $user = \Auth::user();
+//        // echo($username);
+//        $patient = DB::table('visit_record')
+//          ->where('d_username', '=', $user->username)
+//          ->where('p_username', '=', $username)
+//          ->where('patient_name', '=', $name)
+//          ->get();
+//        $patient_first = DB::table('visit_record')
+//            ->where('d_username', '=', $user->username)
+//            ->where('p_username', '=', $username)
+//            ->where('patient_name', '=', $name)
+//            ->first();
+//        return view('doctor.patient-profile-view', compact('patient','user','patient_first'));
+//    }
+
+    public function week_view(){
         $user = \Auth::user();
-        // echo($username);
-        $patient = DB::table('visit_record')
-          ->where('d_username', '=', $user->username)
-          ->where('p_username', '=', $username)
-          ->get();
-        return view('doctor.patient-profile-view', compact('patient'));
+        return view('doctor.doctor-week-view', compact('user'));
+    }
+
+    public function schedule_week($user, $day){
+        $next = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDays(7);
+        $prev = Carbon::createFromFormat('Y-m-d h:i:s', $day)->subDays(7);
+
+        $first_day = Carbon::createFromFormat('Y-m-d h:i:s', $day);
+        $second_day = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDay();
+        $third_day = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDays(2);
+        $fourth_day = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDays(3);
+        $fifth_day = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDays(4);
+        $sixth_day = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDays(5);
+        $seventh_day = Carbon::createFromFormat('Y-m-d h:i:s', $day)->addDays(6);
+
+        $first_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $first_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        $second_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $second_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        $third_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $third_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        $fourth_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $fourth_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        $fifth_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $fifth_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        $sixth_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $sixth_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        $seventh_slots = DB::table('appointment_user')
+            ->where('doctor_user', '=', $user)
+            ->where('actual_date', '=', $seventh_day)
+            ->where('approved', '=', 1)
+            ->get();
+
+        /*
+         * first day
+         */
+        $work = '<p><a id="prev" href="/doctor-week-view/'.$user.'/'.$prev.'" style="float:left;position:absolute">
+					<img src="/images/back.png" width="20px" height="20px">Previous week</a>
+						<a id="next" href="/doctor-week-view/'.$user.'/'.$next.'" style="float:right">Next week
+						<img src="/images/forward.png" width="20px" height="20px"></a></p><br>';
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$first_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$first_day->format('jS F').'</div>';
+        foreach($first_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.' '.$fr_s->issues.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+        /*
+         * second day
+         */
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$second_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$second_day->format('jS F').'</div>';
+        foreach($second_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+        /*
+         * third day
+         */
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$third_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$third_day->format('jS F').'</div>';
+        foreach($third_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+        /*
+         * fourth day
+         */
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$fourth_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$fourth_day->format('jS F').'</div>';
+        foreach($fourth_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+        /*
+         * fifth day
+         */
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$fifth_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$fifth_day->format('jS F').'</div>';
+        foreach($fifth_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+
+
+        /*
+         * sixth day
+         */
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$sixth_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$sixth_day->format('jS F').'</div>';
+        foreach($sixth_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+        /*
+         * seventh day
+         */
+        $work .= '<div class="slide">';
+        $work .='<div class="dradmin-appoinment">';
+        $work .='<table>
+				<tr>
+					<th>';
+        $work .='<div class="header-tile-date-name">'.$seventh_day->format('l').'</div>
+				<div class="header-tile-date-value">'.$seventh_day->format('jS F').'</div>';
+        foreach($seventh_slots as $fr_s){
+            $work .='<tr><td><a href="#" rel="tooltip" data-placement="right" 
+            title='.$fr_s->patient_name.' '.$fr_s->issues.'>
+            '.$fr_s->patient_name.'<br/><span>'.Carbon::createFromFormat('Y-m-d h:i:s', $fr_s->appointment_time)->format('h:i A')
+                .'</span></a></td></tr>';
+        }
+        $work .='    </th>
+				</tr>';
+        $work .='</table>';
+        $work .='</div>';
+        $work .='</div>';
+
+        echo($work);
     }
 }

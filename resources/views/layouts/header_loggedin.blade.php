@@ -126,6 +126,13 @@
 			    width: 70%;
 			  }
 			}
+
+
+
+
+
+
+
 		</style>
 
 
@@ -143,7 +150,6 @@
 		<link href="{{ asset('/css/bootstrap.css') }}" rel="stylesheet">
 
 		<!-- Custom styles for this template -->
-		<link href="{{ asset('/css/app.css') }}" rel="stylesheet">
 		<link href="{{ asset('/css/style.css') }}" rel="stylesheet">
 		<link href="{{ asset('/css/style-responsive.css') }}" rel="stylesheet">
 		<link href="{{ asset('/css/font-awesome.css') }}" rel="stylesheet">
@@ -164,7 +170,7 @@
 		<!-- JS Min
 		================================================== -->
 	 	<!-- <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script> -->
-		<script src="{{ asset('/js/jquery-1.8.3.min.js') }}"></script>
+		<script src="{{ asset('/js/jquery-2.2.3.min.js') }}"></script>
 		<script src="{{ asset('/js/modernizr.custom.js') }}"></script>
 		
 		
@@ -172,11 +178,15 @@
 		================================================== -->		
 	    <script src="{{ asset('/js/jquery.datetimepicker.js') }}"></script>
 		<link rel="stylesheet" type="text/css" href="{{ asset('/css/jquery.datetimepicker.css') }}"/>
+		<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="/js/bootstrap.min.js"/>
 
 
 		<!-- textext autosuggest Styles and Scripts  -->
-		<link rel="stylesheet" href="{{ asset('/css/textext-autosuggest.css') }}" type="text/css" />		
+		<link rel="stylesheet" href="{{ asset('/css/textext-autosuggest.css') }}" type="text/css" />
 		<script src="{{ asset('/js/textext-autosuggest/textext-autosuggest.js') }}" type="text/javascript"></script>
+		{{--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>--}}
+
 
 		
 	</head>
@@ -193,41 +203,7 @@
 						<div class="top-nav">
 							<ul>
 								<li><a href="{{ url('/auth/logout') }}">Sign Out</a></li>
-								<!-- <li>|</li> -->
-								<!-- <li> -->
-									<!-- <a href="#" class="box">Sign Up</a> -->
-									<!-- <a class="dropdown-toggle" href="#popup1">Sign Up</a> -->
-									<!-- <a href="{{ url('/test') }}" onClick="return popup(this, 'notes')" data-toggle="dropdown">Sign Up</a>
-									<!-- <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sign Up</a> -->
-									<!-- <ul class="dropdown-menu">
-									  <li><a href="{{ url('/sign_up_patient') }}">Patient Sign Up</a></li>
-									  <li><a href="{{ url('/sign_up_doctor') }}">Doctor Sign Up</a></li>
-									</ul>
- -->
 
-
-									<!-- <div id="popup1" class="overlay">
-  										<div class="popup">
-		    							
-		      								
-									    
-		    							<a class="close" href="">&times;</a>
-		    							<a href="{{ url('/sign_up_patient') }}" class="something">Patient Sign Up</a>
-		      								<h2>or</h2>
-									  	<a href="{{ url('/sign_up_doctor') }}" class="something">Doctor Sign Up</a>
-		    						
-		  							</div>
-									</div>	 -->
-
-   								    <!-- <div class="dropdown">
-									  <button class="dropbtn">Sign up</button>
-									  <div class="dropdown-content">
-									  	<a href="{{ url('/sign_up_doctor') }}">Doctor Sign Up</a>
-									    <a href="{{ url('/sign_up_patient') }}">Patient Sign Up</a>
-									  < /div-->
-									  
-									<!-- </div> -->
-								<!-- </li> -->
 							</ul>
 						</div>
 					</div>
@@ -264,6 +240,7 @@
 			</div><!-- End .footer -->
 		</div><!-- End #full-body -->
 
+
 		<!-- Bootstrap core JavaScript
 		================================================== -->
 		<script src="/js/bootstrap.js"></script>		
@@ -274,4 +251,7 @@
 	    <script type="text/javascript" src="/js/autosuggestdemo.js"></script>
 		<script src="/js/jquery.prettyPhoto.js"></script>
 	    <script src="/js/scripts.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+	</body>
+
 </html>

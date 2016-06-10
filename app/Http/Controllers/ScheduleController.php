@@ -194,21 +194,24 @@ class ScheduleController extends Controller
     }
 
 
-    public function form_patient($username, $date, $time){
-        $user = \Auth::user();
-        $doctor_info = DB::table('users')
-            ->join('doctor_entity', 'users.username', '=', 'doctor_entity.doctor_user')
-            ->where('users.username', '=', $username)
-            ->get();
+    public function form_patient($username, $date, $time, $serial, $end_date){
+       if(\Auth::check()){
+           $user = \Auth::user();
+           $doctor_info = DB::table('users')
+               ->join('doctor_entity', 'users.username', '=', 'doctor_entity.doctor_user')
+               ->where('users.username', '=', $username)
+               ->get();
 
-        $date = Carbon::createFromFormat('Y-m-d H:i:s', $date);
-        $t_f = $date->format('g:i A');
-        $d_f = $date->format('F').' '. $date->day.', '.$date->format('Y');
-//        echo($d_f);
-        return view('patient.appointment', compact('user', 'doctor_info', 'date', 'time', 'd_f', 't_f'));
-        // echo($doctor_info->speciality);
-//        echo($date);
-        // echo($id);
+           $date = Carbon::createFromFormat('Y-m-d H:i:s', $date);
+           $t_f = $date->format('g:i A');
+           $d_f = $date->format('F').' '. $date->day.', '.$date->format('Y');
+           $end_date = Carbon::createFromFormat('Y-m-d H:i:s', $end_date);
+           return view('patient.appointment', compact('user', 'doctor_info', 'date', 'time', 'd_f', 't_f', 'serial', 'end_date'));
+       }
+       else{
+           return redirect('/sign_it')->withErrors('email', 'You need to log in to apply for slot.');
+       }
+
     }
 
 
@@ -217,6 +220,8 @@ class ScheduleController extends Controller
         $admin = DB::table('users')
             ->where('username', '=', $request->input('entity_user'))
             ->first();
+        $for_date = Carbon::createFromFormat('Y-m-d h:i:s', $request->input('date'));
+        $actual_date = Carbon::create($for_date->year, $for_date->month, $for_date->day, '00', '00');
 
         DB::table('appointment_user')->insert([
                 'patient_user' => $request->input('user_username'),
@@ -228,9 +233,19 @@ class ScheduleController extends Controller
                 'phone_number' => $request->input('phone_number'),
                 'appointed_at' => $request->input('time'),
                 'patient_name' => $request->input('name'),
-                'appointment_time' => $request->input('date')
+                'appointment_time' => $request->input('date'),
+                'sl_no' => $request->input('serial'),
+                'appointment_end' => $request->input('end_date'),
+                'actual_date' => $actual_date
             ]);
 
-        return redirect('/search');
+        DB::table('time_slot')
+            ->where('d_user', '=', $request->input('doctor_user'))
+            ->where('slot_date', '=', $request->input('date'))
+            ->update(['booked' => 1]);
+
+
+        return redirect('/search/'.Carbon::today());
+//        echo($request->input('serial'));
     }
 }

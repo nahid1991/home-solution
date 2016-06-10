@@ -13,7 +13,7 @@
         "maddhatter/laravel-fullcalendar": "^1.2",
         "laracasts/flash": "^2.0",
         "simplesoftwareio/simple-sms": "~2",
-		"aloha/twilio": "~2.1"
+        "aloha/twilio": "^2.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

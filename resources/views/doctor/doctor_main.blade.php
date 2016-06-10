@@ -4,10 +4,7 @@
 			<div class="full-body-conteiner">
 				<div class="container">
 					<div class="row">
-						<!--<?php
-							//$side_link1 = 'class="current"';
-							//include 'includes/doctor-admin-sidebar.php';
-						?>-->
+
 						
 						<div class="col-xs-12 col-sm-4 col-md-3">
 							<div class="pof-sidenav">
@@ -21,15 +18,17 @@
 									<img src="images/pro-holder.jpg">
 								</div>
 								@endif
-								<ul><li>
-										<a href="{{ url('/homepage') }}">Appointments</a></li><li>
-										<a href="{{ url('/set-appointment') }}">Set Office hour</a></li><li>
-										<a href="{{ url('/doc-profile') }}">Profile</a></li><li>
-										<a href="{{ url('/doc-profile-edit') }}">Edit Profile</a></li><li>
-										<a href="{{ url('/doc-blog') }}">Blog</a></li><li>
-										<a href="{{ url('/doc-comments') }}">Comments</a></li><li>
-										<a href="{{ url('/doc-account-settings') }}">Account Settings</a></li><li>
-										<a href="{{ url('/auth/logout') }}">Logout</a></li></ul>
+									<ul><li>
+											<a href="{{ url('/homepage') }}">Home</a></li><li>
+											<a href="{{ url('/set-appointment') }}">Set Office hour</a></li><li>
+											<a href="{{ url('/doc-profile') }}">Profile</a></li><li>
+											<a href="{{ url('/doc-profile-edit') }}">Edit Profile</a></li><li>
+											<a href="{{ url('/doc-blog') }}">Blog</a></li><li>
+											<a href="{{ url('/doc-comments') }}">Comments</a></li><li>
+											<a href="{{ url('/doc-account-settings') }}">Account Settings</a></li><li>
+											<a href="{{ url('/doctor-calendar') }}">Schedule Calendar</a></li><li>
+											<a href="{{ url('/auth/logout') }}">Logout</a>
+										</li></ul>
 							</div>
 						</div>
 
@@ -44,9 +43,10 @@
 									</div>
 									<div class="col-xs-12 col-sm-6 col-md-6">
 										<ul class="view-type-link">
-											<li><a class="current" href="{{ url('/homepage') }}" rel="tooltip" title="Day View"><img src="/images/day-view.png" alt=""><span></span></a></li><li>
-												<!-- <a href="{{ url('/doctor-calendar') }}" rel="tooltip" title="Week View"><img src="/images/week-view.png" alt=""><span></span></a></li><li> -->
-												<a href="{{ url('/doctor-calendar') }}" rel="tooltip" title="Month View"><img src="/images/month-view.png" alt=""><span></span></a></li>
+											<li><a class="current" href="{{ url('/homepage') }}" rel="tooltip"
+												   title="Day View"><img src="/images/day-view.png" alt=""><span></span></a></li><li>
+												<a href="{{ url('/doctor-week') }}" rel="tooltip"
+												   title="Week View"><img src="/images/week-view.png" alt=""><span></span></a></li><li>
 										</ul>
 									</div>
 								</div>								
@@ -65,7 +65,8 @@
 												@if($u_i->approved != 2)
 												<li>
 													<div class="s-left">
-														<h2><a href="{{ action('DoctorController@patient_profile', [$u_i->patient_user]) }}">{{ $u_i->patient_name }}</a></h2>
+														<h2><a href="{{ action('DoctorController@patient_profile', [$u_i->patient_user, $u_i->patient_name]) }}">{{ $u_i->patient_name }}</a></h2>
+														<p>Appointment made by: {{ $u_i->patient_user }}</p>
 														<p>{{ $u_i->issues }}</p>
 													</div><div class="s-right">
 														<div class="time">{{ $u_i->appointed_at }}</div>
@@ -82,26 +83,24 @@
 											</ul>
 										</div><!-- End .pof-desc -->
 									</div><!-- End .pof-content -->
+
+								</div>
+								<div class="col-xs-12 col-sm-6 col-md-6">
+									<div class="pof-content">
+										<div class="pof-header3">
+												<div>
+													<img src="/images/search.png" height="30px" width="30px">
+													<input style="border-radius: 5px" id="search-patient" placeholder="Name" type="text"></div>
+
+										</div>
+										<div class="pof-desc"><div class="patient-cart">
+												<h3>Test <p class="pull-right"> top text</p></h3><p>paragraph 1</p><p>paragraph 1</p></div>
+										</div><!-- End .pof-desc -->
+									</div><!-- End .pof-content -->
+
 								</div>
 
-								<div class="col-xs-12 col-sm-6 col-md-6">
-									<div class="patient-details">
-										<div class="single-pof-pic">
-											<img src="/images/patient-pof-pic.jpg" alt=""/>
-										</div>
-										<div class="single-pof-dsc">
-											<h2>Mic A Ting</h2>
-											<h3>Blood Pressure Issues</h3>
-											<p>
-												DOB: 12 -  25 - 1945
-												<br>
-												Age: 68 Years
-												<br>
-												Tel.: 2514- 2541-2516
-											</p>											
-										</div>
-									</div>
-								</div>
+
 							</div>
 
 						</div><!-- End .col -->

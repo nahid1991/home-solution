@@ -16,53 +16,19 @@ use Services_Twilio;
 
 use Redirect;
 
+
 class EntityController extends Controller
 {
-    // public function dashboard(){
-    // 	return view('entity-admin-dashboard');
-    // }
+
 
     public function appointments(){
     	$user = \Auth::user();
         
         $listed_doc_pat = DB::table('users')
             ->join('doctor_entity', 'users.username', '=', 'doctor_entity.entity_user')
-            // ->join('appointment_user', 'users.username', '=', 'appointment_user.admin_user')
             ->where('users.username', '=', $user->username)
             ->get();
-            //doctors who are already 
-
-
-
-        
-        
         return view('entity.entity-admin-appointments-view', compact('user', 'listed_doc_pat'));
-
-        
-
-
-
-        // return view('entity.entity-admin-appointments-view', compact('user', 'listed_doc_pat', 'doc_info', 'pat_info', 
-        //     'sche_doc_pat', 'test'));
-        // foreach($sche_doc_pat as $sdp){
-        //     $pat_info = DB::table('users')
-        //         ->where('username', '=', $sdp->patient_user)
-        //         ->get();
-        // }
-        // foreach($doc_info as $doc_inf){
-            
-        //     // ->join('doctor_schedule', 'doctor_schedule.doctor_user', '=', 'users.username')
-        //     //     ->where('users.username', '=', $list_doc->doctor_user)
-        //     //     ->get();
-        //     // echo($list_doc->doctor_user);
-        //         echo($doc_inf->name);
-        // }
-
-        // return view('entity.entity-admin-appointments-view', compact('user', 'listed_doc_pat', 'doc_info', 'pat_info', 
-        //     'sche_doc_pat', 'test'));
-        // return view('entity.entity-admin-appointments-view', compact('user'));
-
-        // echo($user->created_at);
     }
 
     
@@ -74,25 +40,6 @@ class EntityController extends Controller
     }
 
     public function test(Request $request){
-        // $user = \Auth::user();
-        // $doc_info = DB::table('users')
-        //     ->where('username', '=', $request->input('doctor_user'))
-        //     ->first();
-        // $doc_schedule = DB::table('users')
-        //     ->join('doctor_schedule', 'users.username', '=', 'doctor_schedule.doctor_user')
-        //     ->where('username', '=', $request->input('doctor_user'))
-        //     ->get();
-        // $listed_doc_pat = DB::table('users')
-        //     ->join('doctor_entity', 'users.username', '=', 'doctor_entity.entity_user')
-        //     // ->join('appointment_user', 'users.username', '=', 'appointment_user.admin_user')
-        //     ->where('users.username', '=', $user->username)
-        //     ->get();
-        // $patient_list = DB::table('users')
-        //     ->join('appointment_user', 'users.username', '=', 'appointment_user.doctor_user')
-        //     ->where('username', '=', $request->input('doctor_user'))
-        //     ->get();
-        // return view('entity.doctor-result', compact('user', 'doc_info', 'doc_schedule', 'listed_doc_pat', 'patient_list'));
-        // return redirect('/find-doc/'.$doc_info->username);
         return redirect('/doctor/'.$request->input('doctor_user'));
     }
     
@@ -116,7 +63,11 @@ class EntityController extends Controller
             ->join('appointment_user', 'users.username', '=', 'appointment_user.doctor_user')
             ->where('username', '=', $username)
             ->get();
-        return view('entity.doctor-result', compact('user', 'doc_info', 'doc_schedule', 'listed_doc_pat', 'patient_list', 'username'));
+        $month = Carbon::today()->month;
+        $year = Carbon::today()->year;
+        return view('entity.doctor-result', compact('user', 'doc_info', 'doc_schedule',
+            'listed_doc_pat', 'patient_list', 'username',
+            'month', 'year'));
         // return redirect('/find-doc/'.$doc_info->username);
     }
 
@@ -141,7 +92,6 @@ class EntityController extends Controller
             ->get();
         $listed_doc_pat = DB::table('users')
             ->join('doctor_entity', 'users.username', '=', 'doctor_entity.entity_user')
-            // ->join('appointment_user', 'users.username', '=', 'appointment_user.admin_user')
             ->where('users.username', '=', $user->username)
             ->get();
         $patient_list = DB::table('users')
@@ -152,13 +102,12 @@ class EntityController extends Controller
     }
 
 
-    public function approve($username, $p_name, $time){
+    public function approve($username, $p_name, $time, $serial){
         $trick = DB::table('appointment_user')
             ->where('doctor_user', '=', $username)
             ->where('patient_name', '=', $p_name)
             ->where('appointment_time', '=', $time)
             ->first();
-        $user = \Auth::user();
         
         
         // echo($pu);
@@ -175,6 +124,9 @@ class EntityController extends Controller
                 'appointed_at' => $trick->appointed_at,
                 'patient_name' => $trick->patient_name,
                 'appointment_time' => $time,
+                'appointment_end' => $trick->appointment_end,
+                'actual_date' => $trick->actual_date,
+                'sl_no' => $trick->sl_no
             ]);
 
         DB::table('appointment_user')
@@ -186,33 +138,23 @@ class EntityController extends Controller
         $doc_info = DB::table('users')
             ->where('username', '=', $username)
             ->first();
-        $doc_schedule = DB::table('users')
-            ->join('doctor_schedule', 'users.username', '=', 'doctor_schedule.doctor_user')
-            ->where('username', '=', $username)
-            ->get();
-        $listed_doc_pat = DB::table('users')
-            ->join('doctor_entity', 'users.username', '=', 'doctor_entity.entity_user')
-            // ->join('appointment_user', 'users.username', '=', 'appointment_user.admin_user')
-            ->where('users.username', '=', $user->username)
-            ->get();
-        $patient_list = DB::table('users')
-            ->join('appointment_user', 'users.username', '=', 'appointment_user.doctor_user')
-            ->where('username', '=', $username)
-            ->get();
+        $appointment_time = Carbon::createFromFormat('Y-m-d h:i:s', $time);
+        $hour = $appointment_time->format('h:i A');
+        $date = $appointment_time->format('jS \\of F');
 
         $account_sid = "AC0ea2b450fbf9bcaa2aaa8464536c6f85"; // Your Twilio account sid
         $auth_token = "3501d13a64fbe6c80a5f30d6d36459ca"; // Your Twilio auth token
 
         $client = new Services_Twilio($account_sid, $auth_token);
-        $message = $client->account->messages->sendMessage(
+        $client->account->messages->sendMessage(
             '+12565302615', // From a Twilio number in your account
             '+880'.$trick->phone_number, // Text any number
-            "Hello Ibnul monkey!"
+            'Hello subscriber your appointment request for DR.'.$doc_info->name.' for '.$hour.' '.
+                $date.' SL no.'.$serial.' has been accepted.'
         );
 
 
         return Redirect::back();
-//        return view('entity.doctor-result', compact('user', 'doc_info', 'doc_schedule', 'listed_doc_pat', 'patient_list'));
     }
 
 
@@ -246,30 +188,30 @@ class EntityController extends Controller
         return redirect('/homepage');
     }
 
-    public function calendar($username){
+    public function calendar($username, $month, $year){
         $user = \Auth::user();
         $doc_info = DB::table('users')
             ->where('username', '=', $username)
             ->first();
-        $month = Carbon::now();
-        $num_month = $month->month;
-        $num_year = $month->year;
+        $mon = Carbon::create($year,$month,'01','00','00');
+        $num_month = $mon->month;
+        $num_year = $mon->year;
         // echo($month->month);
-        $month = $month->format('F Y');
-        return view('entity.entity-doctor-calendar', compact('user', 'month', 'num_month', 'num_year', 'doc_info'));
+        $yr = $mon->format('Y');
+        $mon = $mon->format('F');
+
+        return view('entity.entity-doctor-calendar', compact('user', 'month', 'num_month',
+            'num_year', 'doc_info', 'mon', 'year', 'yr', 'username'));
         // echo($username);
     }
 
 
     public function make($username, $year, $month, $day){
-        // echo($username);
         $user = \Auth::user();
         $date = Carbon::create($year, $month, $day, '00', '00');
         $doc_info = DB::table('users')
             ->where('username', '=', $username)
             ->first();
-
-        // echo($doc_info->username);
         $date_human = $date->year.'-'.$date->month.'-'.$date->day;
         $name_o_day = $date->format('l');
 
@@ -316,7 +258,7 @@ class EntityController extends Controller
         }
 
        
-        return redirect('/calendar/'.$username);
+        return Redirect::back();
         
         
     }
@@ -377,6 +319,59 @@ class EntityController extends Controller
             ->get();
 
         return view('entity.entity-admin-view-profile', compact('user', 'en_info'));
+    }
+
+
+    public function today($username){
+//        echo($username);
+        $serials = DB::table('appointment_user')
+            ->where('doctor_user', '=', $username)
+            ->where('actual_date', '=', Carbon::today())
+            ->get();
+        $user = \Auth::user();
+        $doc_info = DB::table('users')
+            ->where('username', '=', $username)
+            ->first();
+        $doc_schedule = DB::table('users')
+            ->join('doctor_schedule', 'users.username', '=', 'doctor_schedule.doctor_user')
+            ->where('username', '=', $username)
+            ->get();
+        $listed_doc_pat = DB::table('users')
+            ->join('doctor_entity', 'users.username', '=', 'doctor_entity.entity_user')
+            ->where('users.username', '=', $user->username)
+            ->get();
+
+        return view('entity.today-serial', compact('user', 'doc_info', 'doc_schedule', 'listed_doc_pat', 'username', 'serials'));
+    }
+
+
+    public function en_prev_month($user, $month, $year){
+        if($month == 1){
+            $month = 12;
+            $year = $year - 1;
+//            echo($month);
+            return redirect('/calendar/'.$user.'/'.$month.'/'.$year);
+        }
+        else{
+            $month = $month-1;
+//            echo($month);
+            return redirect('/calendar/'.$user.'/'.$month.'/'.$year);
+        }
+    }
+
+
+    public function en_next_month($user, $month, $year){
+        if($month == 12){
+            $month = 1;
+            $year = $year + 1;
+//            echo($month);
+            return redirect('/calendar/'.$user.'/'.$month.'/'.$year);
+        }
+        else{
+            $month = $month+1;
+//            echo($month);
+            return redirect('/calendar/'.$user.'/'.$month.'/'.$year);
+        }
     }
 
 }
